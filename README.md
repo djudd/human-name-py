@@ -52,3 +52,13 @@ cargo build --release
 Then, fork this repo (`djudd/human-name-py`), replace `libhuman_name.so` with
 the file from `human-name/target/release`, and run `bundle exec rake` to ensure
 the specs are passing.
+
+# Alternatives
+
+You might also consider using the pure-Python [nameparser](https://github.com/derek73/python-nameparser).
+Parsing performance is just about identical; the advantage we gain from the Rust
+implementation we surrender in the overhead of the ctypes interface.
+
+`humanname` _does_ offer significantly more sophisticated comparison logic,
+which understands how initials relate to names, can in many cases handle
+nicknames and transliteration intelligently, etc.
