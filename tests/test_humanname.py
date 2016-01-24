@@ -71,20 +71,22 @@ def test_matches_slug_or_localpart_nonmatching():
     assert not Name.parse("Jane Doe").matches_slug_or_localpart('johnxdoe')
 
 
-"""
-  it 'does not leak memory' do
-    def rss
-      GC.start
-      `ps -o rss= -p #{Process.pid}`.chomp.to_i
-    end
+def test_no_memory_leak():
+    import gc
+    import os
 
-    before = rss
+    def rss():
+        gc.collect()
+        out = os.popen("ps -o rss= -p %d" % os.getpid()).read()
+        return int(out.strip())
 
-    100000.times do
-      n = HumanName.parse("John Doe")
-      HumanName::NAME_PARTS.each { |part| n.send(part) }
-    end
+    before = rss()
 
-    expect(rss).to be < 2 * before
-  end
-"""
+    for _ in range(100000):
+        n = Name.parse("John Doe")
+        n.given_name
+        n.surname
+
+    after = rss()
+
+    assert after < 1.1 * before
