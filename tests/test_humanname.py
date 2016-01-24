@@ -83,10 +83,10 @@ def test_no_memory_leak():
     before = rss()
 
     for _ in range(100000):
-        n = Name.parse("John Doe")
+        n = Name.parse("Reallyverylongfirstname Reallyverylonglastname")
         n.given_name
         n.surname
 
     after = rss()
 
-    assert after < 1.1 * before
+    assert after < 1.25 * before
