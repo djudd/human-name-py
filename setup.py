@@ -4,10 +4,6 @@ from os import path
 
 here = path.abspath(path.dirname(__file__))
 
-# Get the long description from the README file
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
-
 # Get the version from version.py
 with open('humanname/version.py') as f:
     exec(f.read(), globals(), locals())
@@ -16,7 +12,6 @@ setup(
     name='humanname',
     version=__version__,
     description='Python bindings for the Rust crate `human_name`, a library for parsing and comparing human names',
-    long_description=long_description,
     url='https://github.com/djudd/human-name-py',
     author='David Judd',
     author_email='david.a.judd@gmail.com',
