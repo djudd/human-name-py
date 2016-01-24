@@ -1,4 +1,5 @@
 language: python
+python: 2.7
 
 os:
   - linux
@@ -13,3 +14,7 @@ env:
 install: pip install tox
 
 script: tox
+
+matrix:
+  allow_failures:
+  - { env: "TOXENV=py35", os: "linux" } # Python 3.5 doesn't seem to be available on Travis, but works for me locally

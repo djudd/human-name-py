@@ -57,7 +57,7 @@ the tests are passing.
 
 You might also consider using the pure-Python [nameparser](https://github.com/derek73/python-nameparser).
 Parsing performance is just about identical; the advantage we gain from the Rust
-implementation we surrender in the overhead of the ctypes interface.
+implementation we surrender in the overhead of the `ctypes` interface.
 
 `humanname` _does_ offer significantly more sophisticated comparison logic,
 which understands how initials relate to names, can in many cases handle
