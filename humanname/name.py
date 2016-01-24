@@ -3,6 +3,7 @@ import os
 
 from ctypes import cdll, c_char_p, c_void_p, c_bool
 
+
 def _load_lib():
     dirname = os.path.dirname(os.path.abspath(__file__))
     ext = 'dylib' if sys.platform.startswith('darwin') else 'so'
@@ -11,31 +12,24 @@ def _load_lib():
 
 lib = _load_lib()
 
-_free_name = lib.human_name_free_name
-_free_name.argtypes = [c_void_p]
-
-_free_string = lib.human_name_free_string
-_free_string.argtypes = [c_char_p]
-
-_parse = lib.human_name_parse
-_parse.restype = c_void_p
-_parse.argtypes = [c_char_p]
 
 class _RustString(c_char_p):
     pass
 
-# Unfortunately since "ctypes does not implement original object return" it does
-# not appear to be possible to avoid a redundant allocation here (a Rust string
-# and then a Python one).
+
+# Unfortunately since "ctypes does not implement original object return" it
+# does not appear to be possible to avoid a redundant allocation here (a Rust
+# string and then a Python one).
 #
 # https://docs.python.org/2/library/ctypes.html#ctypes-fundamental-data-types-2
 def _string_converter(rust_string, _func, _args):
     val = rust_string.value
-    if val == None:
+    if val is None:
         return None
     else:
         _free_string(rust_string)
-        return val
+        return val.decode('UTF-8')
+
 
 def _init_name_part(part):
     func = getattr(lib, 'human_name_' + part)
@@ -43,6 +37,17 @@ def _init_name_part(part):
     func.argtypes = [c_void_p]
     func.errcheck = _string_converter
     return func
+
+
+_free_string = lib.human_name_free_string
+_free_string.argtypes = [c_char_p]
+
+_free_name = lib.human_name_free_name
+_free_name.argtypes = [c_void_p]
+
+_parse = lib.human_name_parse
+_parse.restype = c_void_p
+_parse.argtypes = [c_char_p]
 
 _surname = _init_name_part('surname')
 _given_name = _init_name_part('given_name')
@@ -73,10 +78,17 @@ _hash.argtypes = [c_void_p]
 _byte_len = lib.human_name_byte_len
 _byte_len.argtypes = [c_void_p]
 
+
 class Name(object):
 
     @staticmethod
     def parse(string):
+        if isinstance(string, bytes):
+            # Validate encoding
+            string.decode('UTF-8')
+        else:
+            string = string.encode('UTF-8')
+
         parsed = _parse(string)
         if parsed is None:
             return None
@@ -90,13 +102,16 @@ class Name(object):
         _free_name(self._rust_obj)
 
     def __eq__(self, other):
-        return isinstance(other, Name) and _consistent_with(self._rust_obj, other._rust_obj)
+        if not isinstance(other, Name):
+            return False
+
+        return _consistent_with(self._rust_obj, other._rust_obj)
 
     def __hash__(self):
         return _hash(self._rust_obj)
 
     def __repr__(self):
-        return "Name({})".format(self.display_full)
+        return "Name(%s)" % self.display_full
 
     def __str__(self):
         return self.display_full
