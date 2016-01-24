@@ -15,82 +15,63 @@ def test_simple_name():
     assert n.goes_by_middle_name is False
     assert n.length == 8
 
+
+def test_complex_name():
+    n = Name.parse("JOHN ALLEN Q DE LA MACDONALD JR")
+    assert n.given_name == 'John'
+    assert n.surname == 'de la MacDonald'
+    assert n.suffix == 'Jr.'
+    assert n.display_full == 'John Allen Q. de la MacDonald, Jr.'
+    assert n.display_first_last == 'John de la MacDonald'
+    assert n.display_initial_surname == 'J. de la MacDonald'
+    assert n.length == len('John Allen Q. de la MacDonald, Jr.')
+
+
+def test_failure():
+    assert Name.parse('nope') is None
+
+
+def test_non_utf8():
+    string = u"Björn O'Malley-Muñoz".encode("ISO-8859-1").decode("ISO-8859-1")
+
+    n = Name.parse(string)
+    assert n.given_name == u"Björn"             # Normalized NFKD
+    assert n.surname == u"O'Malley-Muñoz"       # Normalized NFKD
+
+
+def test_equality_identical():
+    assert Name.parse("Jane Doe") == Name.parse("Jane Doe")
+
+
+def test_equality_consistent():
+    assert Name.parse("Jane Doe") == Name.parse("J. Doe")
+
+
+def test_equality_inconsistent():
+    assert Name.parse("Jane Doe") != Name.parse("John Doe")
+
+
+def test_hash_identical():
+    assert hash(Name.parse("Jane Doe")) == hash(Name.parse("Jane Doe"))
+
+
+def test_hash_consistent():
+    assert hash(Name.parse("Jane Doe")) == hash(Name.parse("J. Doe"))
+
+
+def test_hash_different_surnames():
+    assert hash(Name.parse("Jane Doe")) != hash(Name.parse("Jane Dee"))
+
+
+def test_matches_slug_or_localpart_matching():
+    assert Name.parse("Jane Doe").matches_slug_or_localpart('janexdoe')
+
+
+def test_matches_slug_or_localpart_nonmatching():
+    assert not Name.parse("Jane Doe").matches_slug_or_localpart('johnxdoe')
+
+
 """
-
-    it 'parses complex name' do
-      n = HumanName.parse("JOHN ALLEN Q DE LA MACDONALD JR")
-      expect(n.given_name).to eq('John')
-      expect(n.surname).to eq('de la MacDonald')
-      expect(n.middle_names).to eq('Allen')
-      expect(n.suffix).to eq('Jr.')
-      expect(n.display_full).to eq('John Allen Q. de la MacDonald, Jr.')
-      expect(n.display_first_last).to eq('John de la MacDonald')
-      expect(n.display_initial_surname).to eq('J. de la MacDonald')
-      expect(n.length).to eq('John Allen Q. de la MacDonald, Jr.'.length)
-    end
-
-    it 'returns nil on failure' do
-      expect(HumanName.parse 'nope').to be_nil
-    end
-
-    it 'handles non-UTF8 encoding' do
-      input = "Björn O'Malley-Muñoz".encode("ISO-8859-1")
-      n = HumanName.parse(input)
-      expect(n.given_name).to eq("Björn") # normalized nfkd
-      expect(n.surname).to eq("O'Malley-Muñoz") # normalized nfkd
-    end
-  end
-
-  describe '==' do
-    it 'is true for identical names' do
-      expect(HumanName.parse "Jane Doe").to eq(HumanName.parse "Jane Doe")
-    end
-
-    it 'is true for consistent but non-identical names' do
-      expect(HumanName.parse "Jane Doe").to eq(HumanName.parse "J. Doe")
-    end
-
-    it 'is false for inconsistent names' do
-      expect(HumanName.parse "Jane Doe").not_to eq(HumanName.parse "John Doe")
-    end
-  end
-
-  describe 'hash' do
-    it 'is identical for identical names' do
-      expect(HumanName.parse("Jane Doe").hash).to eq(HumanName.parse("Jane Doe").hash)
-    end
-
-    it 'is identical for consistent names' do
-      expect(HumanName.parse("Jane Doe").hash).to eq(HumanName.parse("J. Doe").hash)
-    end
-
-    it 'is different for names with different surnames' do
-      expect(HumanName.parse("Jane Doe").hash).not_to eq(HumanName.parse("J. Dee").hash)
-    end
-  end
-
-  describe 'matches_slug_or_localpart' do
-    it 'is true given match' do
-      expect(HumanName.parse("Jane Doe").matches_slug_or_localpart('janexdoe')).to be_truthy
-    end
-
-    it 'is false given non-match' do
-      expect(HumanName.parse("Jane Doe").matches_slug_or_localpart('johnxdoe')).to be_falsey
-    end
-  end
-
-  it 'implements as_json' do
-    n = HumanName.parse("JOHN ALLEN Q DE LA MACDONALD JR")
-    expect(n.as_json).to eq({
-      given_name: 'John',
-      surname: 'de la MacDonald',
-      middle_names: 'Allen',
-      first_initial: 'J',
-      middle_initials: 'AQ',
-      suffix: 'Jr.',
-    })
-  end
-
   it 'does not leak memory' do
     def rss
       GC.start

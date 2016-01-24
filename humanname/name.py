@@ -22,7 +22,7 @@ class _RustString(c_char_p):
 # string and then a Python one).
 #
 # https://docs.python.org/2/library/ctypes.html#ctypes-fundamental-data-types-2
-def _string_converter(rust_string, _func, _args):
+def _rust_to_py_string(rust_string, _func, _args):
     val = rust_string.value
     if val is None:
         return None
@@ -31,11 +31,19 @@ def _string_converter(rust_string, _func, _args):
         return val.decode('UTF-8')
 
 
+def _py_to_rust_string(string):
+    if isinstance(string, bytes):
+        string.decode('UTF-8')          # Validate encoding
+        return string
+    else:
+        return string.encode('UTF-8')
+
+
 def _init_name_part(part):
     func = getattr(lib, 'human_name_' + part)
     func.restype = _RustString
     func.argtypes = [c_void_p]
-    func.errcheck = _string_converter
+    func.errcheck = _rust_to_py_string
     return func
 
 
@@ -72,7 +80,7 @@ _goes_by_middle_name = lib.human_name_goes_by_middle_name
 _goes_by_middle_name.restype = c_bool
 _goes_by_middle_name.argtypes = [c_void_p]
 
-_hash = lib.human_name_goes_by_middle_name
+_hash = lib.human_name_hash
 _hash.argtypes = [c_void_p]
 
 _byte_len = lib.human_name_byte_len
@@ -83,12 +91,7 @@ class Name(object):
 
     @staticmethod
     def parse(string):
-        if isinstance(string, bytes):
-            # Validate encoding
-            string.decode('UTF-8')
-        else:
-            string = string.encode('UTF-8')
-
+        string = _py_to_rust_string(string)
         parsed = _parse(string)
         if parsed is None:
             return None
@@ -165,4 +168,5 @@ class Name(object):
         return _byte_len(self._rust_obj)
 
     def matches_slug_or_localpart(self, string):
+        string = _py_to_rust_string(string)
         return _matches_slug_or_localpart(self._rust_obj, string)
