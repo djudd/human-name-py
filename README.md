@@ -50,8 +50,8 @@ cargo build --release
 ```
 
 Then, fork this repo (`djudd/human-name-py`), replace `libhuman_name.so` with
-the file from `human-name/target/release`, and run `bundle exec rake` to ensure
-the specs are passing.
+the file from `human-name/target/release`, and run `py.test` or `tox` to ensure
+the tests are passing.
 
 # Alternatives
 
