@@ -6,10 +6,19 @@ os:
   - osx
 
 env:
-  - TOXENV=py26
   - TOXENV=py27
   - TOXENV=py34
   - TOXENV=py35
+
+before_install:
+  - if [ ! -e "$HOME/.cargo/bin" ]; then curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain nightly -y; fi
+  - export PATH="$HOME/.cargo/bin:$PATH"
+  - rustup default nightly
+  - pushd $HOME
+  - git clone https://github.com/djudd/human-name
+  - pushd human-name && cargo rustc --release --lib -- -C link-args=-dynamic_lookup && popd
+  - popd
+  - cp $HOME/human-name/target/release/libhuman_name.* humanname/
 
 install: pip install tox
 
