@@ -5,6 +5,8 @@ os:
   - linux
   - osx
 
+dist: trusty
+
 env:
   - TOXENV=py27
   - TOXENV=py34
