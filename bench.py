@@ -19,6 +19,7 @@ def parse_all():
         if n is not None:
             n.surname
 
+
 t = timeit(parse_all, number=25)
 
 print("Parsing %d names 25 times (humanname): %fs" % (len(names), t))
@@ -33,6 +34,7 @@ except ImportError:
 def parse_all_nameparser():
     for string in names:
         HumanName(string).last
+
 
 t = timeit(parse_all, number=25)
 

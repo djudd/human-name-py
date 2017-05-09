@@ -10,6 +10,7 @@ def _load_lib():
     fname = os.path.join(dirname, 'libhuman_name.' + ext)
     return cdll.LoadLibrary(fname)
 
+
 lib = _load_lib()
 
 
