@@ -1,16 +1,14 @@
+sudo: false
 language: python
-python: 2.7
+python:
+  - "2.7"
+  - "3.4"
 
 os:
   - linux
   - osx
 
 dist: trusty
-
-env:
-  - TOXENV=py27
-  - TOXENV=py34
-  - TOXENV=py35
 
 before_install:
   - if [ ! -e "$HOME/.cargo/bin" ]; then curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain nightly -y; fi
@@ -22,10 +20,6 @@ before_install:
   - popd
   - cp $HOME/human-name/target/release/libhuman_name.* humanname/
 
-install: pip install tox
+install: pip install tox-travis
 
 script: tox
-
-matrix:
-  allow_failures:
-  - { env: "TOXENV=py35", os: "linux" } # Python 3.5 doesn't seem to be available on Travis, but works for me locally
