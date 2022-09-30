@@ -8,7 +8,7 @@ def test_simple_name():
     assert n.given_name == 'Jane'
     assert n.surname == 'Doe'
     assert n.middle_names is None
-    assert n.suffix is None
+    assert n.generational_suffix is None
     assert n.display_full == 'Jane Doe'
     assert n.display_first_last == 'Jane Doe'
     assert n.display_initial_surname == 'J. Doe'
@@ -20,7 +20,7 @@ def test_complex_name():
     n = Name.parse("JOHN ALLEN Q DE LA MACDONALD JR")
     assert n.given_name == 'John'
     assert n.surname == 'de la MacDonald'
-    assert n.suffix == 'Jr.'
+    assert n.generational_suffix == 'Jr.'
     assert n.display_full == 'John Allen Q. de la MacDonald, Jr.'
     assert n.display_first_last == 'John de la MacDonald'
     assert n.display_initial_surname == 'J. de la MacDonald'
@@ -61,14 +61,6 @@ def test_hash_consistent():
 
 def test_hash_different_surnames():
     assert hash(Name.parse("Jane Doe")) != hash(Name.parse("Jane Dee"))
-
-
-def test_matches_slug_or_localpart_matching():
-    assert Name.parse("Jane Doe").matches_slug_or_localpart('janexdoe')
-
-
-def test_matches_slug_or_localpart_nonmatching():
-    assert not Name.parse("Jane Doe").matches_slug_or_localpart('johnxdoe')
 
 
 def test_no_memory_leak():
