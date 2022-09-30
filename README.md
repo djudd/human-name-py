@@ -1,8 +1,6 @@
 # human-name-py
 Python bindings for the Rust crate `human_name`, a library for parsing and comparing human names.
 
-[![Build Status](https://travis-ci.org/djudd/human-name-py.svg?branch=master)](https://travis-ci.org/djudd/human-name-py)
-
 See the [`human_name` docs](http://djudd.github.io/human-name) for details.
 
 # Examples
@@ -36,22 +34,12 @@ See the [`human_name` docs](http://djudd.github.io/human-name) for details.
 
 # Supported environments
 
-Without modification, 64-bit Linux or OS X 10.9+. Depends on a `.so` or `.dylib`
-dynamic library built on Travis' container infrastructure, which means Ubuntu 12.04
-or OS X 10.9.5.
+Linux, MacOS, and Windows, as of the versions currently supported by GitHub Actions.
+x86 only, except for Apple Silicon.
 
-In theory, anywhere where the nightly Rust compiler will run. First, build your
-own `libhuman_name.so` (or `libhuman_name.dylib` on OS X):
-```bash
-curl -s https://static.rust-lang.org/rustup.sh | sh -s -- --channel=nightly
-git clone git@github.com:djudd/human-name.git
-cd human-name
-cargo build --release
-```
-
-Then, fork this repo (`djudd/human-name-py`), replace `libhuman_name.so` with
-the file from `human-name/target/release`, and run `py.test` or `tox` to ensure
-the tests are passing.
+If you have access to another environment which is supported by the Rust compiler,
+it should be relatively straightforward to fork the library and add support. If this
+environment is additionally supported by GitHub Actions, I'm also happy to accept a PR.
 
 # Alternatives
 

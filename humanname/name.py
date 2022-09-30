@@ -1,13 +1,27 @@
-import sys
+import platform
 import os
 
 from ctypes import cdll, c_char_p, c_void_p, c_bool
 
 
 def _load_lib():
+    system = platform.system()
+    if system == 'Darwin':
+        filename = 'libhuman_name.dylib'
+    elif system == 'Linux':
+        filename = 'libhuman_name.so'
+    elif system == 'Windows':
+        filename = 'human_name.dll'
+    else:
+        raise ImportError("Unsupported system: %s" % system)
+
+    cpu = platform.machine()
+
     dirname = os.path.dirname(os.path.abspath(__file__))
-    ext = 'dylib' if sys.platform.startswith('darwin') else 'so'
-    fname = os.path.join(dirname, 'libhuman_name.' + ext)
+    fname = os.path.join(dirname, 'native', cpu, filename)
+    if not os.path.exists(fname):
+        raise ImportError("Unsupported system: %s-%s" % (system, cpu))
+
     return cdll.LoadLibrary(fname)
 
 lib = _load_lib()
