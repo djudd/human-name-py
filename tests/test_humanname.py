@@ -72,6 +72,11 @@ def test_matches_slug_or_localpart_nonmatching():
 
 
 def test_no_memory_leak():
+    # Don't run this test on Windows
+    import platform
+    if platform.system() != 'Darwin' and platform.system() != 'Linux':
+        return
+
     import gc
     import os
 
