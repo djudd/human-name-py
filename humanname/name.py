@@ -79,7 +79,7 @@ _initials = _init_name_part('initials')
 _first_initial = _init_name_part('first_initial')
 _middle_initials = _init_name_part('middle_initials')
 _middle_names = _init_name_part('middle_names')
-_suffix = _init_name_part('suffix')
+_generational_suffix = _init_name_part('generational_suffix')
 _display_first_last = _init_name_part('display_first_last')
 _display_full = _init_name_part('display_full')
 _display_initial_surname = _init_name_part('display_initial_surname')
@@ -87,10 +87,6 @@ _display_initial_surname = _init_name_part('display_initial_surname')
 _consistent_with = lib.human_name_consistent_with
 _consistent_with.restype = c_bool
 _consistent_with.argtypes = [c_void_p, c_void_p]
-
-_matches_slug_or_localpart = lib.human_name_matches_slug_or_localpart
-_matches_slug_or_localpart.restype = c_bool
-_matches_slug_or_localpart.argtypes = [c_void_p, c_char_p]
 
 _goes_by_middle_name = lib.human_name_goes_by_middle_name
 _goes_by_middle_name.restype = c_bool
@@ -160,8 +156,8 @@ class Name(object):
         return _middle_names(self._rust_obj)
 
     @property
-    def suffix(self):
-        return _suffix(self._rust_obj)
+    def generational_suffix(self):
+        return _generational_suffix(self._rust_obj)
 
     @property
     def display_first_last(self):
@@ -182,7 +178,3 @@ class Name(object):
     @property
     def length(self):
         return _byte_len(self._rust_obj)
-
-    def matches_slug_or_localpart(self, string):
-        string = _py_to_rust_string(string)
-        return _matches_slug_or_localpart(self._rust_obj, string)
