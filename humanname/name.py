@@ -15,7 +15,9 @@ def _load_lib():
     else:
         raise ImportError("Unsupported system: %s" % system)
 
-    cpu = platform.machine().lower()
+    cpu = platform.machine()
+    if cpu == 'AMD64':
+        cpu = 'x86_64'
 
     dirname = os.path.dirname(os.path.abspath(__file__))
     fname = os.path.join(dirname, 'native', cpu, filename)
